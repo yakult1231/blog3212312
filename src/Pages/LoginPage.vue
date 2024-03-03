@@ -20,9 +20,9 @@
                     <div class="flex justify-center items-center flex-col absolute">
                         <h1 class="text-3xl font-sans">Hello Again!</h1>
                         <h2 class="mt-3">Welcome back, you've been missed!</h2>
-                        <input type="text" placeholder="Enter Username" class=" rounded-md shadow-md mt-7 pl-3  pr-28 py-4">
+                        <input v-model="username" type="text" placeholder="Enter Username" class=" rounded-md shadow-md mt-7 pl-3  pr-28 py-4">
                         <div class="relative">
-                            <input :type="isPasswordHidden ? 'password' : 'text'"  placeholder="Password" class="rounded-md shadow-md mt-4 pl-3  pr-28 py-4">
+                            <input v-model="password" :type="isPasswordHidden ? 'password' : 'text'"  placeholder="Password" class="rounded-md shadow-md mt-4 pl-3  pr-28 py-4">
                             <button class=" w-[50px] h-[50px] absolute top-5 right-1" @click="isPasswordHidden = !isPasswordHidden">
                                 <FontAwesomeIcon class=" text-lg" :icon="`fa-solid ${isPasswordHidden ? 'fa-eye' : 'fa-eye-slash'}`" />
                             </button>
@@ -33,7 +33,7 @@
                             <button class=" text-gray-500 text-sm j">Recovery Password</button>
                         </div>
                         <div>
-                            <button class=" bg-red-400 hover:bg-red-500 delay-50 px-32 py-4 rounded-md text-white shadow-md shadow-red-400 hover:shadow-red-500">Sign in</button>
+                            <button @click="onLogin" class=" bg-red-400 hover:bg-red-500 delay-50 px-32 py-4 rounded-md text-white shadow-md shadow-red-400 hover:shadow-red-500">Sign in</button>
                         </div>
                         <h4 class=" mt-5 text-xs text-gray-500 font-bold">Or continue with</h4>
                         <div class="flex mt-4">
@@ -52,15 +52,38 @@
 <script lang="ts">
     import { defineComponent } from 'vue'
     import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+    import api from '../views/api'
 
     export default defineComponent({
         data() {
             return {
                 isPasswordHidden: false,
+                username: '',
+                password: '',
             }
         },
         components:{
             FontAwesomeIcon,
+        },
+        methods: {
+            onLogin() {
+                console.log(this.username, this.password);
+                api
+                
+                    .post('/auth/login', {
+                        username: this.username,
+                        password: this.password
+                    })
+                    
+                    .then((resp) =>{
+                        localStorage.setItem('token', resp.data.token)
+                    })
+
+                    .catch((err) => {
+                        console.error(err)
+                        alert(err.message)
+                    })
+            }
         }
     })
 </script>
